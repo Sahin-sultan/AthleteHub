@@ -12,6 +12,12 @@ const navLinks = [
   { name: 'Contact', path: '/contact' },
 ];
 
+// Auth links for nav
+const authLinks = [
+  { name: 'Login', path: '/login' },
+  { name: 'Sign Up', path: '/signup' },
+];
+
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { state } = useCart();
@@ -19,10 +25,10 @@ export const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/30">
-      <div className="container-custom">
-        <div className="flex items-center justify-between h-20">
+      <div className="container-custom px-3 max-w-full">
+        <div className="flex items-center justify-between h-16">
           {/* Left - Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="nav-left hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -30,7 +36,7 @@ export const Header = () => {
                 className="group relative"
               >
                 {link.name === 'Home' ? (
-                  <div className="relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300">
+                    <div className="relative p-2 pl-0 rounded-lg hover:bg-accent/10 transition-all duration-300">
                     <motion.div
                       whileHover={{ scale: 1.15 }}
                       whileTap={{ scale: 0.9 }}
@@ -59,7 +65,7 @@ export const Header = () => {
           </nav>
 
           {/* Center - Logo */}
-          <Link to="/" className="absolute left-1/2 -translate-x-1/2 group">
+          <Link to="/" className="absolute left-1/2 -translate-x-1/2 group px-3">
             <div className="text-center">
               <span className="block font-bold text-2xl editorial-heading tracking-tight">
                 Athlete<span className="text-accent">Hub</span>
@@ -70,10 +76,10 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* Right - Actions */}
-          <div className="flex items-center gap-4">
+          {/* Right - Actions (positioned to screen edge) */}
+          <div className="header-right absolute right-3 top-0 h-16 flex items-center gap-4">
             <Link to="/cart" className="hidden md:block">
-              <div className="relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group">
+              <div className="icon-wrapper relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group">
                 <motion.div
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.9 }}
@@ -99,6 +105,24 @@ export const Header = () => {
                 )}
               </div>
             </Link>
+            {/* Auth icon for login/signup (right of cart, styled like cart, new icon) */}
+            <Link to="/login" className="hidden md:block">
+              <div className="icon-wrapper relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group">
+                <motion.div
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="relative"
+                >
+                  <lord-icon
+                    src="https://cdn.lordicon.com/hroklero.json"
+                    trigger="hover"
+                    style={{width: '28px', height: '28px'}}
+                  ></lord-icon>
+                  <div className="absolute inset-0 rounded-full bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </motion.div>
+                <span className="sr-only">Login</span>
+              </div>
+            </Link>
 
             {/* Mobile Menu Button */}
             <Button
@@ -114,7 +138,7 @@ export const Header = () => {
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
+          <AnimatePresence>
         {isMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -122,7 +146,7 @@ export const Header = () => {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-background border-b border-border"
           >
-            <nav className="container-custom py-6 flex flex-col gap-2">
+            <nav className="container-custom px-3 py-6 flex flex-col gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
@@ -137,6 +161,18 @@ export const Header = () => {
                   {link.name}
                 </Link>
               ))}
+              {/* Auth icon for login/signup (mobile) */}
+              <Link to="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 py-4 px-4">
+                <lord-icon
+                  src="https://cdn.lordicon.com/spzqjmbt.json"
+                  trigger="hover"
+                  style={{width: '32px', height: '32px'}}
+                ></lord-icon>
+                <span className="text-sm">Login</span>
+              </Link>
+              <Link to="/signup" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 py-2 px-4">
+                <span className="text-sm">Sign Up</span>
+              </Link>
               <Link to="/cart" className="mt-4 pt-4 border-t border-border">
                 <Button variant="outline" className="w-full">
                   <ShoppingCart className="h-4 w-4 mr-2" />
