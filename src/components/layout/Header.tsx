@@ -12,12 +12,6 @@ const navLinks = [
   { name: 'Contact', path: '/contact' },
 ];
 
-// Auth links for nav
-const authLinks = [
-  { name: 'Login', path: '/login' },
-  { name: 'Sign Up', path: '/signup' },
-];
-
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
@@ -129,55 +123,40 @@ export const Header = () => {
               </div>
             </Link>
             
-            {/* Auth icon - Account dropdown or Login */}
-            {user ? (
-              <div className="hidden md:block relative">
-                <button
-                  onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-                  className="icon-wrapper relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group"
+            {/* Only show user/account icon for authentication actions */}
+            <div className="hidden md:block relative">
+              <button
+                onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+                className="icon-wrapper relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="relative"
                 >
-                  <motion.div
-                    whileHover={{ scale: 1.15 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="relative"
-                  >
-                    {/* Green heartbeat background glow */}
+                  <lord-icon
+                    src="https://cdn.lordicon.com/hroklero.json"
+                    trigger="hover"
+                    style={{width: '28px', height: '28px'}}
+                  ></lord-icon>
+                  <div className="absolute inset-0 rounded-full bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </motion.div>
+              </button>
+              
+              <AnimatePresence>
+                {isAccountMenuOpen && user && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setIsAccountMenuOpen(false)}
+                    ></div>
                     <motion.div
-                      className="absolute inset-0 rounded-full bg-green-500 blur-md"
-                      animate={{
-                        opacity: [0.4, 0.8, 0.4],
-                        scale: [0.9, 1.2, 0.9],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      style={{ zIndex: -1 }}
-                    />
-                    <lord-icon
-                      src="https://cdn.lordicon.com/hroklero.json"
-                      trigger="hover"
-                      style={{width: '28px', height: '28px'}}
-                    ></lord-icon>
-                    <div className="absolute inset-0 rounded-full bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </motion.div>
-                </button>
-                
-                <AnimatePresence>
-                  {isAccountMenuOpen && (
-                    <>
-                      <div 
-                        className="fixed inset-0 z-40" 
-                        onClick={() => setIsAccountMenuOpen(false)}
-                      ></div>
-                      <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-56 bg-card/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-2xl py-2 z-50"
-                      >
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-2 w-56 bg-card/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-2xl py-2 z-50"
+                    >
                         <div className="px-4 py-3 border-b border-border/30">
                           <p className="text-sm font-medium text-foreground">{user.email}</p>
                           <p className="text-xs text-muted-foreground mt-1">
@@ -222,26 +201,7 @@ export const Header = () => {
                     </>
                   )}
                 </AnimatePresence>
-              </div>
-            ) : (
-              <Link to="/login" className="hidden md:block">
-                <div className="icon-wrapper relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group">
-                  <motion.div
-                    whileHover={{ scale: 1.15 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="relative"
-                  >
-                    <lord-icon
-                      src="https://cdn.lordicon.com/hroklero.json"
-                      trigger="hover"
-                      style={{width: '28px', height: '28px'}}
-                    ></lord-icon>
-                    <div className="absolute inset-0 rounded-full bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </motion.div>
-                  <span className="sr-only">Login</span>
-                </div>
-              </Link>
-            )}
+            </div>
 
             {/* Mobile Menu Button */}
             <Button
