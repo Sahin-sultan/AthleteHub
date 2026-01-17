@@ -280,18 +280,45 @@ export const Header = () => {
                   {link.name}
                 </Link>
               ))}
-              {/* Auth icon for login/signup (mobile) */}
-              <Link to="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 py-4 px-4">
-                <lord-icon
-                  src="https://cdn.lordicon.com/spzqjmbt.json"
-                  trigger="hover"
-                  style={{width: '32px', height: '32px'}}
-                ></lord-icon>
-                <span className="text-sm">Login</span>
-              </Link>
-              <Link to="/signup" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 py-2 px-4">
-                <span className="text-sm">Sign Up</span>
-              </Link>
+              {/* Mobile account details and logout if logged in */}
+              {user ? (
+                <div className="flex flex-col gap-2 py-4 px-4 bg-card/80 rounded-xl border border-border/40 mt-2">
+                  <div className="flex items-center gap-3 mb-2">
+                    <lord-icon
+                      src="https://cdn.lordicon.com/hroklero.json"
+                      trigger="hover"
+                      style={{width: '32px', height: '32px'}}
+                    ></lord-icon>
+                    <div>
+                      <div className="font-medium text-foreground text-sm">{user.email}</div>
+                      <div className="text-xs text-muted-foreground">{user.user_metadata?.name || 'Athlete'}</div>
+                    </div>
+                  </div>
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => { setIsMenuOpen(false); navigate('/account'); }}>
+                    <User size={16} className="mr-2" /> My Account
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => { setIsMenuOpen(false); navigate('/settings'); }}>
+                    <Settings size={16} className="mr-2" /> Settings
+                  </Button>
+                  <Button variant="destructive" className="w-full justify-start mt-2" onClick={() => { setIsMenuOpen(false); handleLogout(); }}>
+                    <LogOut size={16} className="mr-2" /> Log Out
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 py-4 px-4">
+                    <lord-icon
+                      src="https://cdn.lordicon.com/spzqjmbt.json"
+                      trigger="hover"
+                      style={{width: '32px', height: '32px'}}>
+                    </lord-icon>
+                    <span className="text-sm">Login</span>
+                  </Link>
+                  <Link to="/signup" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 py-2 px-4">
+                    <span className="text-sm">Sign Up</span>
+                  </Link>
+                </>
+              )}
               <Link to="/cart" className="mt-4 pt-4 border-t border-border">
                 <Button variant="outline" className="w-full">
                   <ShoppingCart className="h-4 w-4 mr-2" />
