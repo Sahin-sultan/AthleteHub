@@ -32,8 +32,8 @@ export default function SignUpPage() {
       if (error) {
         setError(error.message);
       } else {
-        setSuccess('Check your email to confirm your account.');
-        setTimeout(() => navigate('/login'), 2000);
+        setSuccess('Account created! Please check your email and click the confirmation link to activate your account.');
+        setTimeout(() => navigate('/login'), 4000);
       }
     } catch (err: any) {
       setLoading(false);
@@ -172,7 +172,7 @@ export default function SignUpPage() {
             whileHover={{ scale: 1.01, y: -1 }}
             whileTap={{ scale: 0.995 }}
           >
-            <Chrome size={18} className="text-foreground/80" />
+            <span className="text-xl">🔍</span>
             <span>Continue with Google</span>
           </motion.button>
 
