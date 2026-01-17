@@ -18,8 +18,18 @@ export default function LoginPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       setLoading(false);
-      if (error) setError(error.message);
-      else navigate('/');
+      if (error) {
+        // Better error messages
+        if (error.message === 'Invalid login credentials') {
+          setError('Invalid email or password. If you just signed up, please check your email to confirm your account first.');
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('Please check your email and confirm your account before logging in.');
+        } else {
+          setError(error.message);
+        }
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       setLoading(false);
       setError(err?.message || 'Login failed');
@@ -137,7 +147,7 @@ export default function LoginPage() {
             whileHover={{ scale: 1.01, y: -1 }}
             whileTap={{ scale: 0.995 }}
           >
-            <Chrome size={18} className="text-foreground/80" />
+            <span className="text-xl">🔍</span>
             <span>Continue with Google</span>
           </motion.button>
 

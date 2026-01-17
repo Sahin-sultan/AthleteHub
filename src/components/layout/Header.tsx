@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Menu, X } from 'lucide-react';
+import { ShoppingCart, Menu, X, User, LogOut, Settings } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabaseClient';
 
 const navLinks = [
   { name: 'Home', path: '/' },
@@ -20,8 +21,31 @@ const authLinks = [
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const { state } = useCart();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check current user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsAccountMenuOpen(false);
+    navigate('/');
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/30">
@@ -105,24 +129,120 @@ export const Header = () => {
                 )}
               </div>
             </Link>
-            {/* Auth icon for login/signup (right of cart, styled like cart, new icon) */}
-            <Link to="/login" className="hidden md:block">
-              <div className="icon-wrapper relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group">
-                <motion.div
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="relative"
+            
+            {/* Auth icon - Account dropdown or Login */}
+            {user ? (
+              <div className="hidden md:block relative">
+                <button
+                  onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+                  className="icon-wrapper relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group"
                 >
-                  <lord-icon
-                    src="https://cdn.lordicon.com/hroklero.json"
-                    trigger="hover"
-                    style={{width: '28px', height: '28px'}}
-                  ></lord-icon>
-                  <div className="absolute inset-0 rounded-full bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </motion.div>
-                <span className="sr-only">Login</span>
+                  <motion.div
+                    whileHover={{ scale: 1.15 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="relative"
+                  >
+                    {/* Green heartbeat background glow */}
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-green-500 blur-md"
+                      animate={{
+                        opacity: [0.4, 0.8, 0.4],
+                        scale: [0.9, 1.2, 0.9],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      style={{ zIndex: -1 }}
+                    />
+                    <lord-icon
+                      src="https://cdn.lordicon.com/hroklero.json"
+                      trigger="hover"
+                      style={{width: '28px', height: '28px'}}
+                    ></lord-icon>
+                    <div className="absolute inset-0 rounded-full bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </motion.div>
+                </button>
+                
+                <AnimatePresence>
+                  {isAccountMenuOpen && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setIsAccountMenuOpen(false)}
+                      ></div>
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-56 bg-card/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-2xl py-2 z-50"
+                      >
+                        <div className="px-4 py-3 border-b border-border/30">
+                          <p className="text-sm font-medium text-foreground">{user.email}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {user.user_metadata?.name || 'Athlete'}
+                          </p>
+                        </div>
+                        
+                        <div className="py-1">
+                          <button
+                            onClick={() => {
+                              setIsAccountMenuOpen(false);
+                              navigate('/account');
+                            }}
+                            className="w-full px-4 py-2.5 text-sm text-left hover:bg-accent/10 transition-colors flex items-center gap-3"
+                          >
+                            <User size={16} className="text-foreground/70" />
+                            <span>My Account</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => {
+                              setIsAccountMenuOpen(false);
+                              navigate('/settings');
+                            }}
+                            className="w-full px-4 py-2.5 text-sm text-left hover:bg-accent/10 transition-colors flex items-center gap-3"
+                          >
+                            <Settings size={16} className="text-foreground/70" />
+                            <span>Settings</span>
+                          </button>
+                        </div>
+                        
+                        <div className="border-t border-border/30 py-1 mt-1">
+                          <button
+                            onClick={handleLogout}
+                            className="w-full px-4 py-2.5 text-sm text-left hover:bg-red-500/10 text-red-400 transition-colors flex items-center gap-3"
+                          >
+                            <LogOut size={16} />
+                            <span>Log Out</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
-            </Link>
+            ) : (
+              <Link to="/login" className="hidden md:block">
+                <div className="icon-wrapper relative p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 group">
+                  <motion.div
+                    whileHover={{ scale: 1.15 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="relative"
+                  >
+                    <lord-icon
+                      src="https://cdn.lordicon.com/hroklero.json"
+                      trigger="hover"
+                      style={{width: '28px', height: '28px'}}
+                    ></lord-icon>
+                    <div className="absolute inset-0 rounded-full bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </motion.div>
+                  <span className="sr-only">Login</span>
+                </div>
+              </Link>
+            )}
 
             {/* Mobile Menu Button */}
             <Button
